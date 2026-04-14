@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSI AI活用講座 回2：業務整理ダッシュボード</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --card: #ffffff;
+    --accent: #2d5a27;
+    --accent-light: #e8f0e6;
+    --text: #1a1a1a;
+    --text-sub: #666;
+    --border: #e0ddd8;
+    --fixed: #3b82f6;
+    --fixed-bg: #eff6ff;
+    --variable: #8b5cf6;
+    --variable-bg: #f5f3ff;
+    --priority-high: #dc2626;
+    --priority-mid: #f59e0b;
+    --priority-low: #9ca3af;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ===== Landing Page ===== */
+  #landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .landing-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .landing-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .landing-header p {
+    color: var(--text-sub);
+    font-size: 0.95rem;
+  }
+
+  .name-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    max-width: 640px;
+    width: 100%;
+  }
+
+  .name-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .name-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .name-card .name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .name-card .role {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+  }
+
+  /* ===== Dashboard ===== */
+  #dashboard {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dash-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .back-btn {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ===== Sections ===== */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .section h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .section p, .section li {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+  }
+
+  .section ul {
+    padding-left: 1.2rem;
+    margin-top: 0.3rem;
+  }
+
+  .section li {
+    margin-bottom: 0.3rem;
+  }
+
+  /* ===== Task Table ===== */
+  .task-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .task-table th {
+    text-align: left;
+    padding: 0.6rem 0.5rem;
+    border-bottom: 2px solid var(--border);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: var(--text-sub);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .task-table td {
+    padding: 0.6rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+  }
+
+  .tag-fixed {
+    background: var(--fixed-bg);
+    color: var(--fixed);
+  }
+
+  .tag-variable {
+    background: var(--variable-bg);
+    color: var(--variable);
+  }
+
+  .priority {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .priority-high { color: var(--priority-high); }
+  .priority-mid { color: var(--priority-mid); }
+  .priority-low { color: var(--priority-low); }
+
+  /* ===== Recommendation ===== */
+  .recommendation {
+    background: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .recommendation .rec-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .recommendation p {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  /* ===== Steps ===== */
+  .steps {
+    margin-top: 1rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .step-content p {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+  }
+
+  /* ===== Prompt Box ===== */
+  .prompt-box {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.8rem;
+    position: relative;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ccc;
+    padding: 0.3rem 0.7rem;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .copy-btn.copied {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* ===== Feedback ===== */
+  .feedback-group {
+    margin-top: 1rem;
+  }
+
+  .feedback-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .radio-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .radio-option {
+    display: block;
+    cursor: pointer;
+  }
+
+  .radio-option input { display: none; }
+
+  .radio-option span {
+    display: block;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.82rem;
+    transition: all 0.2s;
+  }
+
+  .radio-option input:checked + span {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .radio-option:hover span {
+    border-color: var(--accent);
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .save-indicator {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-top: 0.3rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .save-indicator.show {
+    opacity: 1;
+  }
+
+  /* ===== Progress Bar ===== */
+  .progress-bar {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 2rem;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .progress-step.active {
+    background: var(--accent);
+  }
+
+  .progress-step.done {
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* ===== Navigation ===== */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-btn {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .nav-btn.primary:hover {
+    background: #1e4a1a;
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* ===== Structure Note ===== */
+  .structure-note {
+    background: #fffbeb;
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .structure-note strong {
+    color: #92400e;
+  }
+
+  /* ===== Footer ===== */
+  .page-footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-sub);
+    font-size: 0.75rem;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .name-grid {
+      grid-template-columns: 1fr;
+    }
+    .step {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .task-table {
+      font-size: 0.78rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Landing Page ===== -->
+<div id="landing">
+  <div class="landing-header">
+    <h1>KSI AI活用講座 回2</h1>
+    <p>業務整理ダッシュボード</p>
+    <p style="margin-top:0.5rem; font-size:0.82rem; color:var(--text-sub);">お名前を選んでください</p>
+  </div>
+  <div class="name-grid">
+    <div class="name-card" onclick="selectUser('riko')">
+      <div class="name">Riko</div>
+      <div class="role">Hoopus 全般</div>
+    </div>
+    <div class="name-card" onclick="selectUser('ai')">
+      <div class="name">Ai</div>
+      <div class="role">代表理事</div>
+    </div>
+    <div class="name-card" onclick="selectUser('aya')">
+      <div class="name">Aya</div>
+      <div class="role">事務局・Web・デザイン</div>
+    </div>
+    <div class="name-card" onclick="selectUser('emi')">
+      <div class="name">Emi</div>
+      <div class="role">事務局</div>
+    </div>
+    <div class="name-card" onclick="selectUser('naomi')">
+      <div class="name">Naomi</div>
+      <div class="role">事務局</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Dashboard ===== -->
+<div id="dashboard"></div>
+
+<script>
+// ===== Participant Data =====
+const data = {
+  riko: {
+    name: 'Riko',
+    fullName: '佐藤李子',
+    role: 'Hoopus 全般',
+    tasks: [
+      { id: 1, name: '案件の進捗管理（候補者ステータス追跡）', type: 'fixed', freq: '週3回', time: '10分/回', priority: 'mid' },
+      { id: 2, name: '顧客管理（掲載団体の情報一元管理）', type: 'variable', freq: '日常的', time: '—', priority: 'mid' },
+      { id: 3, name: 'アウトリーチ営業（アタックリスト＋コンタクト）', type: 'variable', freq: '今後開始', time: '—', priority: 'low' },
+      { id: 4, name: '掲載企業調査（サステナ報告書の確認項目抽出）', type: 'variable', freq: '今後開始', time: '膨大', priority: 'high' }
+    ],
+    structure: '課題の根っこは「情報がスプシに平面的に入っていて、立体感を持たせられない」こと。#1と#2は同じ問題（CRM的な情報管理の仕組みがない）。',
+    recommendation: {
+      task: '#4 掲載企業調査',
+      reasons: [
+        'サステナ報告書（PDF/URL）は量が膨大 → AIに読ませて調査項目を抽出するだけで大幅な時短',
+        '今のAI（Claude/ChatGPT）はPDFを読み込んで要約・抽出ができる',
+        '普段やっているリサーチの延長線上にある使い方'
+      ]
+    },
+    preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
+    prepForNext: 'サステナ報告書のPDFを1つ用意しておいてください（ファイルでもURLでもOK）。次回（回3）で使う可能性があります。',
+    steps: [
+      {
+        title: 'サステナ報告書をAIにアップロード',
+        desc: '調査したい企業のサステナ報告書（公開PDF）があれば、それをAIにアップロードしてください。\n\n手元になければ、以下の練習用PDFをダウンロードして使ってください：\n\n📄 東プレ ESGデータブック 2024（33ページ）\nhttps://www.topre.co.jp/sustainability/reports/pdf/topre_ESG_2024.pdf\n\n【手順】URLをブラウザで開く → PDFをダウンロード → Claude/ChatGPTにドラッグ＆ドロップ\n\n【注意】長いPDF（100ページ超）はAIが後半を読み飛ばすことがあります。今回は33ページなので問題ありません。実務では必要なセクションだけ抜き出してから渡すのがコツです。',
+        prompt: null
+      },
+      {
+        title: '調査項目の抽出を指示',
+        desc: 'PDFをアップロードしたら、「この報告書から○○を抽出して」と自分の言葉でAIに指示してみてください。普段の企業調査で確認している項目を思い出して伝えるのがコツです。\n\n何を聞けばいいか迷ったら、下の参考例をコピペしてください。',
+        prompt: '【参考例 — 迷ったらこちらをコピペ】\n\nこのサステナビリティ報告書を読んで、以下の観点で情報を抽出してください。\n\n【抽出項目】\n1. 環境目標と達成状況\n2. 人権・労働に関する方針\n3. サプライチェーンの管理体制\n4. 第三者認証・外部評価の有無\n\n【出力形式】\n各項目について：\n- 該当する記載の要約（2-3行）\n- 報告書内の該当ページ/セクション\n- 記載なしの場合は「記載なし」と明記'
+      },
+      {
+        title: '【時間があれば】抜け漏れをチェック',
+        desc: 'Step 2まででも十分な成果です。時間が余ったら、抽出結果を見て「これも確認したい」「この項目が抜けている」を自分の言葉で追加指示してみてください。\n\n伝え方に迷ったら、下の参考例を使ってください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n上記の抽出結果について：\n1. 重要な情報の見落としはないか確認してください\n2. 記載が曖昧な項目について、報告書内の他のセクションに関連情報がないか探してください\n3. 他社の同業種報告書と比較して、欠けている開示項目があれば指摘してください'
+      }
+    ]
+  },
+
+  ai: {
+    name: 'Ai',
+    fullName: '青沼愛',
+    role: '代表理事',
+    tasks: [
+      { id: 1, name: 'メルマガ配信①（政府情報のピックアップ）', type: 'fixed', freq: '月2回', time: '20分', priority: 'low' },
+      { id: 2, name: 'メルマガ配信②（団体HPからの情報収集）', type: 'fixed', freq: '月2回（できてない）', time: '3日', priority: 'mid' },
+      { id: 3, name: 'メルマガ配信③（他団体メルマガのURL整理）', type: 'fixed', freq: '月2回（できてない）', time: '8時間', priority: 'high' },
+      { id: 4, name: '日常の雑多な判断・整理', type: 'variable', freq: '毎日', time: '—', priority: 'mid' }
+    ],
+    structure: '既にinoreader→Zapier/Make→スプシ→Apps Scriptのパイプラインを構築済み。課題は「パイプラインの出力がカオスになる」こと（URL重複、不要データの混入）。仕組みはある、精度がない。',
+    preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
+    prepForNext: 'メルマガ用スプシのサンプルデータ（数行でOK、個人情報を含まないもの）を用意しておいてください。次回（回3）で使う可能性があります。',
+    recommendation: {
+      task: '#3 メルマガのスプシクリーニング',
+      reasons: [
+        '8時間/回 → AIで整理すれば劇的な時短の可能性',
+        '既存のパイプラインを壊さず、出口のクリーニングだけAIを追加',
+        '個人情報を含まないデータを題材にするので、個人アカウントでも安心して練習できる'
+      ]
+    },
+    steps: [
+      {
+        title: 'データを用意してAIに貼る',
+        desc: 'まず自分のメルマガ用スプシから数行（個人情報を含まないもの）をコピーしてAIに貼り、「このデータを整理して」と伝えてみてください。整理のルール（重複除去・カテゴリ分け等）も自分の言葉で書いてみましょう。\n\n手元にデータがない場合や迷った場合は、下のサンプルをコピペしてください。',
+        prompt: '【サンプルデータ — 手元にデータがない場合はこちらをコピペ】\n\n以下はメルマガ配信のために収集したデータです。このデータを整理してください。\n\n【データ】\nURL,ソース,取得日\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://example.com/logo.png,ロゴ画像,2026-04-02\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-03\nhttps://example.org/event/sustainability-forum-2026,JST,2026-04-03\nhttps://example.com/tracking?id=abc123,トラッキング,2026-04-03\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-04\nhttps://example.org/jobs/esg-analyst,GreenJobs,2026-04-05\nhttps://example.com/unsubscribe?token=xyz,配信解除,2026-04-05\nhttps://example.org/report/tcfd-disclosure-2025,CDP,2026-04-06\nhttps://example.org/event/sustainability-forum-2026,JST,2026-04-06\nhttps://example.org/news/carbon-tax-proposal,Reuters,2026-04-07\n\n【整理ルール】\n1. URLの重複を除去\n2. 画像URL・ロゴURLなど記事コンテンツでないものを除外\n3. 残ったURLをカテゴリ別に分類（政策/イベント/レポート/求人/その他）\n4. 各URLにタイトルと1行要約を付与\n\n【出力形式】\nカテゴリごとにグループ化した表形式で出力してください。'
+      },
+      {
+        title: '整理結果からメルマガ原稿を作らせる',
+        desc: 'Step 1の整理結果を見て、「この中から今回のメルマガに載せる記事を選んで、配信原稿を作って」と自分の言葉で指示してみてください。選ぶ基準（例：「政策とレポートだけ」「新しい順に3本」）も伝えるのがコツです。\n\n伝え方に迷ったら下の参考例を使ってください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n先ほど整理したURLの中から、メルマガに掲載する記事を選んでください。\n\n【選定基準】\n- 「政策」と「レポート」カテゴリから優先的に選ぶ\n- 最大5本\n- 「イベント」は開催日が1ヶ月以内のもののみ\n\n【出力形式】\n選んだ記事ごとに：\n- タイトル\n- 2行の紹介文（読者が「読みたい」と思う書き方で）\n- URL'
+      },
+      {
+        title: 'プロンプトとして保存',
+        desc: 'Step 1-2でうまくいったやり取りを「毎回使える定型プロンプト」にまとめてみましょう。AIに「今の一連のやり取りを、次回以降コピペで使えるプロンプトにまとめて」と頼むのが簡単です。\n\n伝え方に迷ったら下の参考例を使ってください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n先ほどのクリーニング結果を踏まえて：\n1. 除外したURLの件数と理由の内訳を教えてください\n2. カテゴリ分類の基準を明文化してください（次回以降も同じ基準で分類するため）\n3. このクリーニングを毎回行うための「定型プロンプト」を作成してください'
+      }
+    ]
+  },
+
+  aya: {
+    name: 'Aya',
+    fullName: '白石綾',
+    role: '事務局・KSI Web・デザイン',
+    tasks: [
+      { id: 1, name: '顧客への営業メール（面談お誘い）', type: 'variable', freq: '月2回（増やしたい）', time: '30分/回', priority: 'high' },
+      { id: 2, name: 'グラフ生成（レポート用の色・レイアウト調整）', type: 'fixed', freq: '2ヶ月に1回', time: '1時間/図', priority: 'low' },
+      { id: 3, name: 'メルマガ登録・退会管理（Googleグループ）', type: 'fixed', freq: '週1 / 2ヶ月に1回', time: '10分', priority: 'low' },
+      { id: 4, name: '転職状況確認メール（自動送信のカレンダー化）', type: 'fixed', freq: '2ヶ月に1回', time: '30分', priority: 'low' }
+    ],
+    structure: 'Apps Scriptで自動送信を実装するなど実行力が高い。一方で営業メールは「やりたいけどできていない」状態。NotebookLMやGensparkなど特化ツールを使い分けているのも特徴。',
+    preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
+    prepForNext: '回2で練習したメール作成を次回はさらに深掘りします。特に準備は不要です。',
+    recommendation: {
+      task: '#1 営業メール作成',
+      reasons: [
+        '本人が「自動化したい」と明言している業務',
+        'ダミーデータでメール作成を練習し、プロンプトのパターンを身につけられる',
+        '30分→5分程度への時短が見込める'
+      ]
+    },
+    steps: [
+      {
+        title: 'ダミーの候補者データをAIに渡して分析する',
+        desc: '以下のダミーデータをAIに渡してください（練習用です。実データはビジネスアカウント導入後に使います）。\n\nデータを渡したら、「この候補者がこのポジションに興味を持ちそうなポイントは？」と自分の言葉で聞いてみてください。普段の候補者分析で考えていることをそのままAIに聞くイメージです。\n\n聞き方に迷ったら、下のプロンプトをそのままコピペしてもOKです。',
+        prompt: '【ダミーデータ＋参考プロンプト — そのまま使ってもOK】\n\n以下の候補者情報をもとに、この候補者がこのポジションに興味を持ちそうなポイントを3つ挙げてください。\n\n【候補者情報（ダミーデータ）】\n・氏名：A氏（30代後半・女性）\n・現職：大手人材会社 CSR推進室（4年目）\n・前職：国際NGOでプロジェクトコーディネーター（6年）\n・スキル：英語ビジネスレベル、プロジェクトマネジメント、ステークホルダー調整\n・転職意向：より現場に近い立場でソーシャルインパクトのある仕事をしたい\n\n【マッチする求人ポジション】\n・ポジション名：サステナビリティ・コーディネーター\n・組織：NPO法人グリーンブリッジ（企業と連携した環境教育プロジェクトを運営）\n・条件：年収500-650万、週2リモート可、英語力必須'
+      },
+      {
+        title: '面談お誘いメールを生成',
+        desc: 'Step 1の分析結果をもとに、メール作成の指示を自分の言葉で書いてみてください。「カジュアルなトーンで」「300文字以内で」など、普段書くメールのイメージを伝えるのがコツです。\n\n伝え方に迷ったら下の参考例をコピペしてください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n上記の分析をもとに、A氏への面談お誘いメールを作成してください。\n\n【メールの条件】\n- A氏の経歴（NGO経験・CSR推進）に具体的に言及する\n- このポジションが合う理由を2つさりげなく盛り込む\n- カジュアルなトーン（堅すぎない）\n- 300文字以内\n- 面談はオンライン30分、候補者の都合に合わせる旨を記載\n- Hoopus.のマッチングサービスからの連絡であることがわかるように'
+      },
+      {
+        title: '出力を読んで改善指示を出す',
+        desc: '生成されたメールを読んで、気になる点を自分の言葉でAIに伝えてみてください。「もう少し短くして」「この表現は堅すぎる」「候補者目線で返信したくなるか確認して」など。\n\n伝え方に迷ったら下の参考例を使ってください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n作成したメールを以下の観点でチェックしてください：\n1. 過度な断定や誤解を招く表現はないか\n2. 候補者の立場で読んだとき、返信したくなるか\n3. トーンが堅すぎたり馴れ馴れしすぎたりしないか\n\n問題があれば修正版も出してください。'
+      }
+    ]
+  },
+
+  emi: {
+    name: 'Emi',
+    fullName: '林恵美',
+    role: '事務局',
+    tasks: [
+      { id: 1, name: 'リサーチ・資料探し', type: 'variable', freq: '日常的', time: '—', priority: 'mid' },
+      { id: 2, name: '文章の添削・ライティング', type: 'variable', freq: '日常的', time: '—', priority: 'mid' },
+      { id: 3, name: '翻訳（日英）', type: 'fixed', freq: '都度', time: '—', priority: 'low' },
+      { id: 4, name: '企画のブレスト補助', type: 'variable', freq: '都度', time: '—', priority: 'low' }
+    ],
+    structure: 'WordPressテーマ編集やvibe coding（antigravity）の試行経験あり、技術的な挑戦意欲が高い。「Webサイトの修正を自分でやりたい」は回4で扱う予定。',
+    preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
+    prepForNext: '特になし。回2のフィードバックで出た業務をもとに、回3の題材を決めます。',
+    recommendation: {
+      task: 'リサーチ→要約→ドラフト作成',
+      reasons: [
+        '日常的にやっている作業をワークフロー化できる',
+        '「調べる→まとめる→書く」を3ステップに分けると各段階の精度が上がる',
+        '当日、具体的な業務を教えていただければその場で調整します'
+      ]
+    },
+    steps: [
+      {
+        title: 'テーマを決めてリサーチ',
+        desc: '調べたいテーマを自分で決めて、AIに「○○について調べて」と伝えてみてください。普段の業務で「ちょっと調べたいけど時間がない」と思っていたテーマがあれば最適です。\n\nテーマが思いつかない場合は、下のサンプルをそのままコピペしてください。',
+        prompt: '【サンプル — テーマが思いつかない場合はこちらをコピペ】\n\n以下のテーマについてリサーチしてください。\n\n【テーマ】\n日本企業のサステナビリティ人材採用の最新動向\n\n【知りたいこと】\n- 現状の概要（求人数の推移、どんな職種が増えているか）\n- 主要なプレイヤー/事例（積極採用している企業や団体）\n- 最新の動向やトレンド（2024-2025年の変化）\n\n【条件】\n- 信頼できる情報源を優先\n- 日本語の情報と英語の情報の両方を含める\n- 各ポイントに情報の出典/根拠を付記'
+      },
+      {
+        title: '結果を構造化して要約',
+        desc: 'リサーチ結果が出たら、「どういう形式でまとめたいか」を自分の言葉でAIに伝えてみてください。「箇条書きで要点だけ」「上司に報告する形式で」「3行で要約して」など、用途に合わせて伝えるのがコツです。\n\n伝え方に迷ったら下の参考例をコピペしてください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n上記のリサーチ結果を以下の形式で構造化してください。\n\n1. エグゼクティブサマリー（3行以内）\n2. 主要ポイント（箇条書き5つ以内）\n3. 詳細（ポイントごとに2-3行の解説）\n4. 今後注目すべき点\n\n専門用語は平易な言葉で言い換えてください。'
+      },
+      {
+        title: 'ドラフトを作成',
+        desc: '要約をもとに、実際に使うドラフト文章を作らせてみてください。「社内共有用のメモにして」「メルマガの記事にして」など、用途を自分の言葉で伝えるのがコツです。\n\n用途が決まらない場合は、下のサンプルをコピペしてください。',
+        prompt: '【サンプル — 用途が決まらない場合はこちらをコピペ】\n\n上記の要約をもとに、以下の条件でドラフト文章を作成してください。\n\n【用途】\nチーム内で共有するための簡易レポート\n\n【条件】\n- 読者は専門知識を持たない一般のビジネスパーソン\n- 800文字程度\n- 見出し付きで構造化\n- 重要なポイントは太字で強調'
+      }
+    ],
+    isEstimated: true
+  },
+
+  naomi: {
+    name: 'Naomi',
+    fullName: '道玄奈緒美',
+    role: '事務局',
+    tasks: [
+      { id: 1, name: '案件・顧客管理（スプシのステータス更新）', type: 'fixed', freq: 'ほぼ毎日', time: '10-15分', priority: 'mid' },
+      { id: 2, name: '業務マニュアル作成', type: 'variable', freq: '—', time: '—', priority: 'high' },
+      { id: 3, name: 'メール文章作成・添削', type: 'variable', freq: '日常的', time: '—', priority: 'low' },
+      { id: 4, name: '翻訳（日英・英日）', type: 'fixed', freq: '都度', time: '—', priority: 'low' }
+    ],
+    structure: 'Rikoさんと同じ悩みを共有（「Ricoさん同様…」）。複数のスプシを並列で見ながらステータスを手打ち更新 → 見落とし・エラーが発生。回1で「業務マニュアルを作りたい」という具体的な要望あり。',
+    preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
+    prepForNext: 'マニュアル化したい業務の手順を、箇条書きでメモしておいてください（頭の中にあればOK）。次回（回3）で使う可能性があります。',
+    recommendation: {
+      task: '#2 業務マニュアル作成',
+      reasons: [
+        '本人が「作りたい」と明言している',
+        '属人化しているオペレーションの言語化はチーム全体に価値がある',
+        'AIに手順を伝えるだけで構造化されたマニュアルが生成される'
+      ]
+    },
+    steps: [
+      {
+        title: '業務の手順を箇条書きで伝える',
+        desc: 'マニュアル化したい業務を1つ決めて、手順を思いつく順にAIに伝えてください。きれいに書く必要はありません。「こうやって、次にこうして…」と話すように箇条書きするだけでOKです。個人名・企業名は入れないでください。\n\n迷ったら下のサンプルをコピペして試してください。',
+        prompt: '【サンプル — 迷ったらこちらをコピペ】\n\n以下の業務手順を、業務マニュアルとして整理してください。\n\n【業務名】\n候補者ステータスの更新\n\n【手順（思いつく順でOK）】\n- メールで選考結果の連絡が来たら、該当のスプレッドシートを開く\n- 候補者名の行を探す\n- ステータス列を更新する（例：書類選考中→面接調整中）\n- 最終更新日を今日の日付に変更する\n- 備考欄にメールの要点をメモする\n- 必要に応じて担当者に共有する\n\n【マニュアルに含めてほしい項目】\n1. 目的（なぜこの業務が必要か）\n2. 前提条件（必要なアクセス権、ツール等）\n3. 手順（番号付き、各ステップの詳細）\n4. 注意点・よくあるミス\n5. 完了確認（どうなっていればOKか）\n6. 問い合わせ先（困ったときに誰に聞くか）'
+      },
+      {
+        title: '出力を確認して改善',
+        desc: 'Step 1で出たマニュアルを見て、「ここが違う」「これが足りない」を自分の言葉でAIに伝えてみてください。例：「手順3と4の間にもう1つ確認作業がある」「注意点にこういうミスがよくある」など。\n\n伝え方に迷ったら、下の参考例を使ってください。',
+        prompt: '【参考例 — 伝え方に迷ったらこちら】\n\n上記のマニュアルについて、以下を追加・改善してください：\n1. 各ステップにかかる目安時間を追加\n2. スプレッドシートの列名（例：A列=候補者名、B列=ステータス…）を具体的に記載\n3. ステータスの選択肢一覧（書類選考中/面接調整中/面接済み/内定/辞退/不通過）を追加'
+      },
+      {
+        title: '抜け漏れチェック＋改善',
+        desc: '出来上がったマニュアルを読み返して、「初めてやる人がこれだけで作業できるか？」を自分で考えてみてください。足りない点や「ここでつまずきそう」と思う箇所をAIに伝えましょう。\n\n何を確認すべきか迷ったら、下の参考例を使ってください。',
+        prompt: '【参考例 — 確認観点に迷ったらこちら】\n\n作成した業務マニュアルについて：\n1. 初めてこの業務を行う人が読んで、一人で作業を完了できるか確認してください\n2. 手順の抜けや曖昧な表現がないか指摘してください\n3. よくあるミスやトラブルのパターンを追加してください\n4. このマニュアルの改善点があれば提案してください'
+      }
+    ]
+  }
+};
+
+// ===== State =====
+let currentUser = null;
+let currentStep = 0;
+const totalSteps = 3; // overview, steps, feedback+notes(form)
+
+// ===== Functions =====
+function selectUser(userId) {
+  currentUser = data[userId];
+  currentStep = 0;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderDashboard();
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  currentUser = null;
+  currentStep = 0;
+}
+
+function goToStep(step) {
+  currentStep = step;
+  renderDashboard();
+  window.scrollTo(0, 0);
+}
+
+function copyPrompt(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'コピー済み';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'コピー';
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'コピー済み';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'コピー';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+
+function saveFeedback(key, value) {
+  const storageKey = `ksi_${currentUser.name}_${key}`;
+  localStorage.setItem(storageKey, value);
+  const indicator = document.getElementById(`save-${key}`);
+  if (indicator) {
+    indicator.textContent = '保存しました';
+    indicator.classList.add('show');
+    setTimeout(() => indicator.classList.remove('show'), 2000);
+  }
+}
+
+function loadFeedback(key) {
+  if (!currentUser) return '';
+  return localStorage.getItem(`ksi_${currentUser.name}_${key}`) || '';
+}
+
+function renderDashboard() {
+  const u = currentUser;
+  const el = document.getElementById('dashboard');
+
+  // Progress bar
+  const progressHtml = `
+    <div class="progress-bar">
+      ${[0,1,2,3].map(i => `<div class="progress-step ${i === currentStep ? 'active' : (i < currentStep ? 'done' : '')}"></div>`).join('')}
+    </div>
+  `;
+
+  const stepLabels = ['業務マップ', 'AIで試す', 'フィードバック＋次回の準備'];
+
+  let contentHtml = '';
+
+  // ===== Step 0: Overview =====
+  if (currentStep === 0) {
+    contentHtml = `
+      <div class="section">
+        <div class="section-label">Step 1 / 4</div>
+        <h2>あなたの業務マップ</h2>
+        <p>ヒアリング回答＋回1の情報をもとに、業務を整理しました。</p>
+
+        <table class="task-table">
+          <thead>
+            <tr>
+              <th>業務</th>
+              <th>分類</th>
+              <th>頻度</th>
+              <th>時間</th>
+              <th>優先度</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${u.tasks.map(t => `
+              <tr>
+                <td>${t.name}</td>
+                <td><span class="tag ${t.type === 'fixed' ? 'tag-fixed' : 'tag-variable'}">${t.type === 'fixed' ? '固定' : '変動'}</span></td>
+                <td>${t.freq}</td>
+                <td>${t.time}</td>
+                <td><span class="priority ${t.priority === 'high' ? 'priority-high' : t.priority === 'mid' ? 'priority-mid' : 'priority-low'}">${t.priority === 'high' ? '◎' : t.priority === 'mid' ? '○' : '△'}</span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+
+        ${u.isEstimated ? `
+          <div class="structure-note" style="margin-top:1rem;">
+            <strong>注:</strong> 事前ヒアリングのQ04（面倒な業務）が未記入だったため、Q03とAI利用状況から推定しています。「実はこれが一番面倒」という業務があれば、フィードバック欄で教えてください。
+          </div>
+        ` : ''}
+
+        <h3>課題の構造</h3>
+        <p>${u.structure}</p>
+
+        <div class="recommendation">
+          <div class="rec-title">「最初の1つ」: ${u.recommendation.task}</div>
+          <ul>
+            ${u.recommendation.reasons.map(r => `<li>${r}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">分類の見方</div>
+        <h2>固定業務 と 変動業務</h2>
+        <table class="task-table">
+          <thead>
+            <tr><th>分類</th><th>意味</th><th>AIの使い方</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-fixed">固定</span></td>
+              <td>手順がほぼ毎回同じ</td>
+              <td>テンプレート化して繰り返し使う</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-variable">変動</span></td>
+              <td>都度判断が必要</td>
+              <td>AIの思考力・分析力を活かす</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top:0.8rem; font-size:0.82rem;">
+          <strong>◎</strong> = 効果大 × すぐ試せる
+          <strong>○</strong> = 効果大だが準備が必要
+          <strong>△</strong> = 頻度低 or 難易度高
+        </p>
+      </div>
+    `;
+  }
+
+  // ===== Step 1: Try with AI =====
+  if (currentStep === 1) {
+    contentHtml = `
+      <div class="section" style="background:var(--bg); border-color:var(--accent);">
+        <div class="section-label" style="color:var(--accent);">今日の準備</div>
+        <p style="font-size:0.85rem;">${u.preparation}</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Step 2 / 4</div>
+        <h2>「${u.recommendation.task}」をAIで試す</h2>
+        <p>以下のステップに沿って、ChatGPT / Claude で実行してみましょう。完璧にやらなくてOK、まず1回投げてみるだけで十分です。</p>
+
+        <div class="steps">
+          ${u.steps.map((s, i) => `
+            <div class="step">
+              <div class="step-num">${i + 1}</div>
+              <div class="step-content">
+                <h4>${s.title}</h4>
+                <p>${s.desc}</p>
+                ${s.prompt ? `
+                  <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyPrompt(this, this.parentElement.querySelector('.prompt-text').textContent)">コピー</button>
+                    <span class="prompt-text">${s.prompt}</span>
+                  </div>
+                ` : '<p style="color:var(--accent); font-size:0.8rem; margin-top:0.5rem;">※ この手順はAIツール上で直接操作してください</p>'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== Step 2: Feedback =====
+  if (currentStep === 2) {
+    contentHtml = `
+      <div class="section">
+        <div class="section-label">Step 3 / 4</div>
+        <h2>フィードバック</h2>
+        <p>業務整理の内容と今日の気づきを教えてください。</p>
+
+        <div style="text-align:center; padding:2rem 1rem;">
+          <p style="font-size:0.95rem; color:var(--text-sub); margin-bottom:1.5rem;">以下のボタンからGoogleフォームで回答してください。<br>回答は講師に送信されます（2-3分で完了します）。</p>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLScGjA-BP5mXajtXeL8UouJYeieywMg_t8guLemZtBPhK9h25A/viewform" target="_blank" rel="noopener" style="display:inline-block; padding:0.8rem 2rem; background:var(--accent); color:white; border-radius:8px; text-decoration:none; font-size:1rem; font-weight:600; box-shadow:0 2px 8px rgba(45,90,39,0.3); transition:background 0.2s;">フィードバックフォームを開く →</a>
+          <p style="font-size:0.78rem; color:#999; margin-top:1rem;">※ 別タブで開きます。回答後このページに戻ってきてください。</p>
+        </div>
+      </div>
+
+      <div class="section" style="background: var(--accent-light); border-color: var(--accent);">
+        <h2 style="color: var(--accent);">次回の準備</h2>
+        <p>次回（回3）は、今日の体験をさらに深掘りします。内容は今日のフィードバックをもとに講師が設計します。</p>
+
+        <div style="margin-top:1rem; padding:1rem 1.2rem; background:white; border-radius:8px; border:1px solid var(--border);">
+          <p style="font-size:0.82rem; font-weight:600; margin-bottom:0.3rem;">次回までにやること:</p>
+          <ul style="font-size:0.82rem; color:var(--text-sub); padding-left:1.2rem; margin:0;">
+            <li style="margin-bottom:0.5rem;">フィードバックフォームの記入（このページの前のステップから）</li>
+            <li>いつも使っているAIツール（ChatGPT / Claude等）にログインした状態で参加</li>
+          </ul>
+        </div>
+
+        ${u.prepForNext ? `
+        <div style="margin-top:1rem; padding:0.8rem 1rem; background:#fffbeb; border:1px solid #f59e0b; border-radius:6px;">
+          <p style="font-size:0.82rem; font-weight:600; margin-bottom:0.3rem; color:#92400e;">回3のハンズオン用に準備しておくもの:</p>
+          <p style="font-size:0.82rem; color:var(--text-sub);">${u.prepForNext}</p>
+        </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // Navigation
+  const navHtml = `
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goToStep(${currentStep - 1})" ${currentStep === 0 ? 'disabled' : ''}>
+        ← ${currentStep > 0 ? stepLabels[currentStep - 1] : ''}
+      </button>
+      ${currentStep < totalSteps - 1 ? `
+        <button class="nav-btn primary" onclick="goToStep(${currentStep + 1})">
+          ${stepLabels[currentStep + 1]} →
+        </button>
+      ` : `
+        <button class="nav-btn primary" onclick="goBack()">
+          トップに戻る
+        </button>
+      `}
+    </div>
+  `;
+
+  el.innerHTML = `
+    <div class="dash-header">
+      <h1>${u.name}さんのダッシュボード</h1>
+      <a class="back-btn" onclick="goBack()">← 選択に戻る</a>
+    </div>
+    ${progressHtml}
+    ${contentHtml}
+    ${navHtml}
+    <div class="page-footer">
+      KSI AI活用講座 回2 — 業務整理ダッシュボード
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
