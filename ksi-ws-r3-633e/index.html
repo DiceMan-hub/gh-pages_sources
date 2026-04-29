@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSI AI活用講座 回3：出力フォーマット制御ダッシュボード</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --card: #ffffff;
+    --accent: #2d5a27;
+    --accent-light: #e8f0e6;
+    --text: #1a1a1a;
+    --text-sub: #666;
+    --border: #e0ddd8;
+    --fixed: #3b82f6;
+    --fixed-bg: #eff6ff;
+    --variable: #8b5cf6;
+    --variable-bg: #f5f3ff;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ===== Landing Page ===== */
+  #landing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+  }
+
+  .landing-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .landing-header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .landing-header p {
+    color: var(--text-sub);
+    font-size: 0.95rem;
+  }
+
+  .name-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    max-width: 540px;
+    width: 100%;
+  }
+
+  .name-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+
+  .name-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .name-card .name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .name-card .role {
+    font-size: 0.8rem;
+    color: var(--text-sub);
+  }
+
+  /* ===== Dashboard ===== */
+  #dashboard {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .dash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dash-header h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .back-btn {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    transition: all 0.2s;
+  }
+
+  .back-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ===== Sections ===== */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .section h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .section h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .section p, .section li {
+    font-size: 0.9rem;
+    color: var(--text-sub);
+  }
+
+  .section ul {
+    padding-left: 1.2rem;
+    margin-top: 0.3rem;
+  }
+
+  .section li {
+    margin-bottom: 0.3rem;
+  }
+
+  /* ===== Tips Card ===== */
+  .tips-card {
+    background: #f0fdf4;
+    border: 2px solid #86efac;
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .tips-card h3 {
+    color: #166534;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .tip-item {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+    align-items: flex-start;
+  }
+
+  .tip-num {
+    flex-shrink: 0;
+    width: 1.6rem;
+    height: 1.6rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .tip-content {
+    flex: 1;
+  }
+
+  .tip-content strong {
+    font-size: 0.88rem;
+    color: #166534;
+  }
+
+  .tip-content p {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    margin-top: 0.2rem;
+  }
+
+  /* ===== Steps ===== */
+  .steps {
+    margin-top: 1rem;
+  }
+
+  .step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  .step-num {
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content h4 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .step-time {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(45,90,39,0.2);
+  }
+
+  .step-content p {
+    font-size: 0.82rem;
+    color: var(--text-sub);
+    white-space: pre-line;
+  }
+
+  /* ===== Prompt Box ===== */
+  .prompt-box {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.8rem;
+    position: relative;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ccc;
+    padding: 0.3rem 0.7rem;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: white;
+  }
+
+  .copy-btn.copied {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  /* ===== Recommendation ===== */
+  .recommendation {
+    background: var(--accent-light);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.2rem 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .recommendation .rec-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .recommendation p {
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  /* ===== Progress Bar ===== */
+  .progress-bar {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 2rem;
+  }
+
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+
+  .progress-step.active {
+    background: var(--accent);
+  }
+
+  .progress-step.done {
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* ===== Navigation ===== */
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-btn {
+    padding: 0.6rem 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .nav-btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .nav-btn.primary:hover {
+    background: #1e4a1a;
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* ===== Footer ===== */
+  .page-footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-sub);
+    font-size: 0.75rem;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .name-grid {
+      grid-template-columns: 1fr;
+    }
+    .step {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Landing Page ===== -->
+<div id="landing">
+  <div class="landing-header">
+    <h1>KSI AI活用講座 回3</h1>
+    <p>出力フォーマット制御ダッシュボード</p>
+    <p style="margin-top:0.5rem; font-size:0.82rem; color:var(--text-sub);">お名前を選んでください</p>
+  </div>
+  <div class="name-grid">
+    <div class="name-card" onclick="selectUser('riko')">
+      <div class="name">Riko</div>
+      <div class="role">Hoopus 全般</div>
+    </div>
+    <div class="name-card" onclick="selectUser('ai')">
+      <div class="name">Ai</div>
+      <div class="role">代表理事</div>
+    </div>
+    <div class="name-card" onclick="selectUser('aya')">
+      <div class="name">Aya</div>
+      <div class="role">事務局・Web・デザイン</div>
+    </div>
+    <div class="name-card" onclick="selectUser('emi')">
+      <div class="name">Emi</div>
+      <div class="role">事務局</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Dashboard ===== -->
+<div id="dashboard"></div>
+
+<script>
+// ===== Participant Data =====
+const data = {
+  riko: {
+    name: 'Riko',
+    fullName: '佐藤李子',
+    role: 'Hoopus 全般',
+    summary: {
+      did: 'サステナ報告書をAIにアップロードして調査項目を抽出（Step 3まで完走）',
+      result: 'ダブルチェックを依頼すると内容が深まることを発見',
+      insight: '思った以上に整理してくれたが、どこまで信頼してよいか難しい',
+      next: 'アウトプットを指定フォーマットに入れ込みたい'
+    },
+    goal: '調査結果を指定フォーマット（CSV/テーブル）で出力＋検証方法を身につける',
+    steps: [
+      {
+        title: '回2の抽出結果をフォーマット指定で再出力',
+        minutes: 8,
+        desc: '回2で使ったサステナ報告書（または新しいもの）をAIにアップロードし、今回は「出力形式」を明示して抽出を指示してください。\n\nポイントは「テーブル形式で」「CSV形式で」と出力の形を最初に伝えること。迷ったら下のプロンプトをコピペしてください。',
+        prompt: 'この報告書から以下の項目を抽出し、CSV形式で出力してください。\n\n【抽出項目】\n1. 環境目標と達成状況\n2. 人権・労働に関する方針\n3. サプライチェーンの管理体制\n4. 第三者認証・外部評価の有無\n\n【出力形式】\nCSV形式（ヘッダー行付き）で以下の列：\n項目名, 要約（2-3行）, 該当ページ, 記載の有無\n\n説明文や前置きは不要です。CSV行のみ出力してください。'
+      },
+      {
+        title: 'サンプル行を見せて精度を上げる',
+        minutes: 7,
+        desc: 'Step 1の出力がイメージと違ったら、「こういう形式で出して」とサンプルを1行見せてください。AIは具体例を見ると出力の精度が格段に上がります。\n\n下のプロンプトを参考にしてください。',
+        prompt: '出力形式を修正します。以下のサンプル行と同じ形式で全項目を出し直してください。\n\n【サンプル行】\n環境目標と達成状況, "2030年までにCO2排出量50%削減を目標。2024年度実績は38%削減で進捗率76%", p.12-14, あり\n\n・各セルの区切りはカンマ\n・要約にカンマが含まれる場合はダブルクォートで囲む\n・サンプル行以外の説明は不要'
+      },
+      {
+        title: '【発展】検証指示で信頼性を確認',
+        minutes: 7,
+        desc: '出力が出たら、「この内容が正しいか検証して」とAIに指示してみてください。AIに自分の出力を自己チェックさせることで、明らかな間違いを減らせます。\n\n完全な正確性は保証されないので、重要な数値は原文と照合する習慣をつけるのがベストです。',
+        prompt: '上記の抽出結果について、以下の検証を行ってください。\n\n1. 各項目の「要約」が報告書の記載内容と一致しているか確認\n2. 該当ページが正しいか照合\n3. 重要な数値（削減率・目標年等）に誤りがないか確認\n4. 報告書に記載があるのに見落としている項目がないか確認\n\n結果を「OK / 要修正」で各項目に付記してください。'
+      },
+      {
+        title: '【発展】テンプレートとして保存',
+        minutes: 5,
+        desc: '回2後に自分でも試した方は、ここまでのプロンプトを「毎回使える定型テンプレート」にまとめてみてください。',
+        prompt: 'ここまでの一連のやり取りを、次回以降にコピペで使える定型プロンプトにまとめてください。\n\n【条件】\n・報告書のPDFをアップロードした後にこのプロンプトを貼るだけで、同じ品質の調査表が出力される\n・抽出項目・出力形式・検証指示を1つのプロンプトに統合\n・変更する可能性がある箇所は【 】で示す'
+      }
+    ]
+  },
+
+  ai: {
+    name: 'Ai',
+    fullName: '青沼愛',
+    role: '代表理事',
+    summary: {
+      did: 'メルマガデータの整理を試みた（Step 1まで）',
+      result: '情報の整理から取り組む必要があると感じた',
+      insight: '何をどう整理しなくてはいけないのか、まず整理が必要',
+      next: 'Coworkで自動化、Firecrawl'
+    },
+    goal: '「何を整理すべきか」をAIに相談し、整理の構造を作る',
+    steps: [
+      {
+        title: 'AIに「何を整理すべきか」を相談する',
+        minutes: 10,
+        desc: '回2では「データを整理して」と頼んだけれど、そもそも何を整理すべきかが不明確でした。\n\n今回は発想を変えて、「整理の方針そのもの」をAIに相談してみましょう。自分の状況をそのままAIに伝えるだけでOKです。\n\n迷ったら下のプロンプトをコピペしてください。',
+        prompt: '以下の状況を整理する方針を提案してください。\n\n【現状】\n・inoreaderでRSSフィードを収集し、Zapier/Makeでスプシに自動蓄積している\n・月2回のメルマガ配信のために、蓄積データからピックアップしている\n・問題：蓄積されるデータがカオス（URL重複、画像リンク混在、カテゴリ未分類）\n・手作業でのクリーニングに8時間/回かかっている\n\n【知りたいこと】\n1. どの情報を残し、どれを捨てるべきか（判断基準）\n2. どういうカテゴリに分類すると配信に使いやすいか\n3. 整理の優先順位（何から手をつけるべきか）\n\n提案は箇条書きで、理由も添えてください。'
+      },
+      {
+        title: 'AIの提案をもとに整理ルールを構造化',
+        minutes: 10,
+        desc: 'Step 1でAIが提案してくれた方針を見て、「これを実際のルールにして」と頼みます。\n\nポイントは「表形式で」「判断基準を明確に」と出力形式を指定すること。',
+        prompt: '先ほどの提案をもとに、以下の形式でクリーニングルールを作ってください。\n\n【出力形式：テーブル】\n| ルール番号 | 条件 | アクション | 理由 |\n\n例：\n| 1 | URLが画像ファイル（.png, .jpg, .gif）で終わる | 除外 | メルマガに使えないコンテンツ |\n\n・ルールは優先順位順に並べる\n・条件は機械的に判定できる具体的な書き方にする\n・10ルール以内に収める\n・説明文は不要。テーブルのみ出力してください。'
+      },
+      {
+        title: 'サンプルデータで試す',
+        minutes: 7,
+        desc: 'Step 2で作ったルールを実際のデータで試してみましょう。回2で使ったサンプルデータ（または自分のスプシの数行）をAIに渡してください。',
+        prompt: '以下のデータに、先ほど作成したクリーニングルールを適用してください。\n\n【データ】\nURL,ソース,取得日\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://example.com/logo.png,ロゴ画像,2026-04-02\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-03\nhttps://example.com/tracking?id=abc123,トラッキング,2026-04-03\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-04\nhttps://example.com/unsubscribe?token=xyz,配信解除,2026-04-05\nhttps://example.org/report/tcfd-disclosure-2025,CDP,2026-04-06\nhttps://example.org/news/carbon-tax-proposal,Reuters,2026-04-07\n\n【出力形式】\n1. 適用結果テーブル：各URLに「残す/除外」と適用ルール番号を付記\n2. クリーニング後のデータ（残すURLのみ、カテゴリ付き）\n\n説明文は不要。テーブルのみ出力してください。'
+      }
+    ]
+  },
+
+  aya: {
+    name: 'Aya',
+    fullName: '白石綾',
+    role: '事務局・Web・デザイン',
+    summary: {
+      did: 'ダミーデータで候補者分析→メール生成（Step 3まで完走・Claude使用）',
+      result: '指示に対してなぜそうしたか説明してくれるので納得感があった',
+      insight: 'プロンプトの書き方が難しい。データ整理→メール自動化の全体像が見えた',
+      next: '候補者データの一括まとめ→分析→パーソナライズメール自動化'
+    },
+    goal: '候補者情報の入力フォーマットを設計し、ダミー3名分で一括メール生成',
+    steps: [
+      {
+        title: '候補者データの入力フォーマットを設計',
+        minutes: 8,
+        desc: '回2ではダミーデータを自由形式で渡しました。今回は「毎回同じ形式で渡せるフォーマット」を作ります。\n\nAIに「こういうデータを管理したい」と相談して、フォーマットを提案してもらいましょう。迷ったら下のプロンプトをコピペしてください。',
+        prompt: '以下の業務で使う候補者データの入力フォーマットを設計してください。\n\n【業務】\n求人マッチングサービスの候補者管理。候補者データをもとに、合う求人をマッチングし、面談お誘いメールを生成する。\n\n【フォーマットに含めたい情報】\n・基本情報（年代・性別・現職・前職）\n・スキル・資格\n・転職意向（何を求めているか）\n・マッチする求人情報\n\n【条件】\n・CSV形式で、スプレッドシートにそのまま貼れる形\n・ヘッダー行のサンプルと、入力例を1行示す\n・各列の入力ルール（選択肢がある場合は明記）\n・説明文は不要。フォーマット定義のみ出力してください。'
+      },
+      {
+        title: 'ダミー3名分のデータで一括メール生成',
+        minutes: 12,
+        desc: 'Step 1のフォーマットにダミーデータを3名分入れて、AIに一括でメールを生成させます。\n\n【進め方のコツ】まず**1名分だけ**で試して、出力イメージを掴んでから3名分一括にチャレンジしてください。いきなり3名一括だとプロンプトが複雑になるので、段階的に進めるのがおすすめです。\n\n「3名分まとめて」と指示するのがポイントです。',
+        prompt: '以下の3名の候補者データをもとに、それぞれにパーソナライズした面談お誘いメールを生成してください。\n\n【候補者データ（CSV）】\n氏名,年代,現職,前職,スキル,転職意向,マッチ求人\nA氏,30代後半女性,大手人材会社CSR推進室(4年),国際NGOプロジェクトコーディネーター(6年),英語ビジネス・PM・ステークホルダー調整,現場に近いソーシャルインパクト,NPO法人グリーンブリッジ サステナビリティコーディネーター\nB氏,40代前半男性,外資系メーカー環境部門(8年),環境コンサル(5年),ISO14001・LCA・英語ネイティブ,経営に近い立場で環境戦略,スタートアップX社 サステナビリティ責任者\nC氏,20代後半女性,自治体環境課(3年),大学院(環境政策修士),政策分析・データ分析・Python,民間で環境×テクノロジー,テック企業Y社 ESGデータアナリスト\n\n【メールの条件】\n・各候補者の経歴に具体的に言及\n・このポジションが合う理由を2つ盛り込む\n・カジュアルなトーン、300文字以内\n・Hoopus.のマッチングサービスからの連絡\n\n【出力形式】\n3通のメールを候補者名で区切って出力。各メール本文のみ（件名不要）。'
+      },
+      {
+        title: '品質チェック＋テンプレート化',
+        minutes: 7,
+        desc: '生成されたメール3通を比較して、品質が揃っているか確認します。そしてこの一連の流れを「テンプレート」にまとめます。',
+        prompt: '生成した3通のメールについて：\n\n1. 3通の品質が均一か確認（トーン・長さ・パーソナライズの深さ）\n2. 不自然な表現や過度な断定がないか確認\n3. 問題があれば修正版を出力\n\nその後、以下の形式で再利用テンプレートを作成してください：\n\n【テンプレート】\n・候補者CSVデータを貼った後にこのプロンプトを送るだけで、同じ品質のメールが出力される\n・変更する可能性がある箇所は【 】で示す\n・メール条件（トーン・文字数・言及ポイント数）を冒頭に明記'
+      }
+    ]
+  },
+
+  emi: {
+    name: 'Emi',
+    fullName: '林恵美',
+    role: '事務局',
+    summary: {
+      did: '調査のベースをAIで作成（Step 3まで完走・両方試した）',
+      result: '深掘りまでスムーズ。アウトプット（スプシ/CSV）がうまくいかなかった',
+      insight: 'ファクトチェックは必要だが調査のベースとして使える',
+      next: '複数スタッフ間で同じフォーマット・品質で調査を行う方法'
+    },
+    goal: '調査結果をCSV形式で出力＋同じプロンプトで再現できることを確認',
+    steps: [
+      {
+        title: '調査テーマを決めてフォーマット指定で出力',
+        minutes: 10,
+        desc: '回2と同じ（または新しい）テーマで調査し、今回は「出力形式」を最初に指定します。\n\n「CSV形式で」「テーブル形式で」と明示するだけで、出力が劇的に変わります。迷ったら下のプロンプトをコピペしてください。',
+        prompt: '以下のテーマについてリサーチし、結果をCSV形式で出力してください。\n\n【テーマ】\n日本企業のサステナビリティ人材採用の最新動向\n\n【出力形式】\nCSV形式（ヘッダー行付き）で以下の列：\n企業/団体名, 取り組み内容, 規模・数値, 時期, 情報源URL\n\n【サンプル行】\nトヨタ自動車, サステナビリティ専門職を新設し30名採用, 30名, 2025年4月, https://example.com/...\n\n・10件以上\n・日本語と英語の情報源を両方含める\n・説明文や前置きは不要。CSV行のみ出力してください。'
+      },
+      {
+        title: 'サンプル行で精度を調整',
+        minutes: 8,
+        desc: 'Step 1の出力がイメージと違ったら、「こういう形で出して」とサンプルを1行見せて再出力させてください。\n\n「余計な説明は不要」と制約を追加するのもコツです。',
+        prompt: '出力形式を修正します。以下の条件で出し直してください。\n\n1. 各セルにカンマが含まれる場合はダブルクォートで囲む\n2. 「情報源URL」は実在するURLのみ（推測しない。不明な場合は「要確認」と記載）\n3. CSV行のみ出力。前後の説明文・コードブロックの記号(```)は不要\n4. ヘッダー行を最初に含める'
+      },
+      {
+        title: '同じプロンプトで再現性を確認',
+        minutes: 9,
+        desc: 'Step 1-2でうまくいったプロンプトを保存して、もう一度最初から試してみてください。\n\n同じプロンプトで同じ品質の出力が出れば、「他のスタッフが使っても同じ結果になる」ということです。これが品質統一の基盤になります。',
+        prompt: 'ここまでのやり取りを、次回以降にコピペで使える定型プロンプトにまとめてください。\n\n【条件】\n・テーマ名を変えるだけで、同じフォーマットの調査結果が出力される\n・出力形式の指定（CSV・列定義・サンプル行・制約）をすべて含む\n・変更する可能性がある箇所は【 】で示す\n・このプロンプトを別のスタッフが使っても同じ品質になることを意識'
+      }
+    ]
+  }
+};
+
+// ===== State =====
+let currentUser = null;
+let currentStep = 0;
+const totalSteps = 3;
+
+// ===== Functions =====
+function selectUser(userId) {
+  currentUser = data[userId];
+  currentStep = 0;
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderDashboard();
+  window.scrollTo(0, 0);
+}
+
+function goBack() {
+  document.getElementById('landing').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+  currentUser = null;
+  currentStep = 0;
+}
+
+function goToStep(step) {
+  currentStep = step;
+  renderDashboard();
+  window.scrollTo(0, 0);
+}
+
+function copyPrompt(btn, id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'OK';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = 'OK';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+const stepLabels = ['回2の振り返り', 'ハンズオン', 'フィードバック'];
+
+function renderDashboard() {
+  const u = currentUser;
+  const el = document.getElementById('dashboard');
+
+  const progressHtml = `
+    <div class="progress-bar">
+      ${[0,1,2].map(i => `<div class="progress-step ${i === currentStep ? 'active' : (i < currentStep ? 'done' : '')}"></div>`).join('')}
+    </div>
+  `;
+
+  let contentHtml = '';
+
+  // ===== Step 0: Summary =====
+  if (currentStep === 0) {
+    contentHtml = `
+      <div class="section">
+        <div class="section-label">Step 1 / 3</div>
+        <h2>回2の振り返り</h2>
+        <p>前回のフォーム回答をもとにまとめました。補足があれば発表のときに教えてください。</p>
+
+        <table style="width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:1rem;">
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.5rem; font-weight:600; color:var(--accent); width:100px;">やったこと</td>
+            <td style="padding:0.5rem; color:var(--text-sub);">${u.summary.did}</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.5rem; font-weight:600; color:var(--accent);">結果</td>
+            <td style="padding:0.5rem; color:var(--text-sub);">${u.summary.result}</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:0.5rem; font-weight:600; color:var(--accent);">気づき</td>
+            <td style="padding:0.5rem; color:var(--text-sub);">${u.summary.insight}</td>
+          </tr>
+          <tr>
+            <td style="padding:0.5rem; font-weight:600; color:var(--accent);">次にやりたい</td>
+            <td style="padding:0.5rem; color:var(--text-sub);">${u.summary.next}</td>
+          </tr>
+        </table>
+
+        <div class="recommendation" style="margin-top:1.5rem;">
+          <div class="rec-title">今日のゴール</div>
+          <p>${u.goal}</p>
+        </div>
+      </div>
+
+      <div class="tips-card">
+        <h3>今日の3つのコツ：出力フォーマットを制御する</h3>
+        <div class="tip-item">
+          <div class="tip-num">1</div>
+          <div class="tip-content">
+            <strong>出力形式を明示する</strong>
+            <p>「CSV形式で」「テーブル形式で」「箇条書きで」と指定するだけ</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">2</div>
+          <div class="tip-content">
+            <strong>サンプルを1つ見せる</strong>
+            <p>欲しい出力の例を1行だけプロンプトに入れると精度が格段に上がる</p>
+          </div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-num">3</div>
+          <div class="tip-content">
+            <strong>「これ以外は出力しないで」と制約する</strong>
+            <p>「説明文は不要」「データ行のみ」と余計なものを除外する</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== Step 1: Hands-on =====
+  if (currentStep === 1) {
+    contentHtml = `
+      <div class="section" style="background:var(--bg); border-color:var(--accent);">
+        <div class="section-label" style="color:var(--accent);">今日の準備</div>
+        <p style="font-size:0.85rem;">いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。個人情報は入れないでください（ダミーデータ・公開情報のみ）。</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Step 2 / 3</div>
+        <h2>ハンズオン：「${u.goal.split('＋')[0]}」</h2>
+        <p>以下のステップに沿って進めてください。迷ったらプロンプトをコピペでOK。今日の3つのコツ（出力形式を明示・サンプルを見せる・制約する）を意識して使ってみましょう。</p>
+
+        <div class="steps">
+          ${u.steps.map((s, i) => `
+            <div class="step">
+              <div class="step-num">${i + 1}</div>
+              <div class="step-content">
+                <h4>${s.title}${s.minutes ? `<span class="step-time">目安 約${s.minutes}分</span>` : ''}</h4>
+                <p>${s.desc}</p>
+                ${s.prompt ? `
+                  <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyPrompt(this, 'prompt-${i}')">copy</button>
+                    <span id="prompt-${i}">${s.prompt}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ===== Step 2: Feedback =====
+  if (currentStep === 2) {
+    contentHtml = `
+      <div class="section">
+        <div class="section-label">Step 3 / 3</div>
+        <h2>フィードバック</h2>
+        <p>今日の気づきを教えてください。回4の設計に活かします。</p>
+
+        <div style="text-align:center; padding:2rem 1rem;">
+          <p style="font-size:0.95rem; color:var(--text-sub); margin-bottom:1.5rem;">以下のボタンからGoogleフォームで回答してください。<br>回答は講師に送信されます（2-3分で完了します）。</p>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSehtGv_yxuYmSXDb2z4GB75MjHqMUdeN9TECnhTRayOfb5QGA/viewform" target="_blank" rel="noopener" style="display:inline-block; padding:0.8rem 2rem; background:var(--accent); color:white; border-radius:8px; text-decoration:none; font-size:1rem; font-weight:600; box-shadow:0 2px 8px rgba(45,90,39,0.3); transition:background 0.2s;">フィードバックフォームを開く</a>
+        </div>
+      </div>
+
+      <div class="section" style="background: var(--accent-light); border-color: var(--accent);">
+        <h2 style="color: var(--accent);">次回予告：回4（vibe coding）</h2>
+        <p>日本語で指示するだけで動くツール/ページが作れることを体験します。</p>
+
+        <div style="margin-top:1rem; padding:1rem 1.2rem; background:#fffbeb; border-radius:8px; border:1px solid #fbbf24;">
+          <p style="font-size:0.82rem; font-weight:700; color:#92400e; margin-bottom:0.5rem;">回4で扱う題材（皆さんからの要望から）</p>
+          <ul style="font-size:0.82rem; color:var(--text-sub); padding-left:1.2rem; margin:0; line-height:1.7;">
+            <li style="margin-bottom:0.3rem;"><strong>Aiさん</strong>：Cowork・Firecrawlでデータ収集・整理を仕組み化（今日作った"整理の設計図"がベースになります）</li>
+            <li style="margin-bottom:0.3rem;"><strong>Ayaさん</strong>：ES講座のnote/Webページ化／Hoopusサイト改善</li>
+            <li><strong>Emiさん</strong>：Hoopusサイトの修正をAIと一緒に</li>
+          </ul>
+        </div>
+
+        <div style="margin-top:1rem; padding:1rem 1.2rem; background:white; border-radius:8px; border:1px solid var(--border);">
+          <p style="font-size:0.82rem; font-weight:600; margin-bottom:0.3rem;">次回までにやること:</p>
+          <ul style="font-size:0.82rem; color:var(--text-sub); padding-left:1.2rem; margin:0;">
+            <li style="margin-bottom:0.5rem;">フィードバックフォームの記入</li>
+            <li style="margin-bottom:0.5rem;">「こんなツール/ページがあったら便利」のアイデアを考えておく</li>
+            <li>いつも使っているAIツールにログインした状態で参加</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  }
+
+  // Navigation
+  const navHtml = `
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="goToStep(${currentStep - 1})" ${currentStep === 0 ? 'disabled' : ''}>
+        ${currentStep > 0 ? stepLabels[currentStep - 1] : ''}
+      </button>
+      ${currentStep < totalSteps - 1 ? `
+        <button class="nav-btn primary" onclick="goToStep(${currentStep + 1})">
+          ${stepLabels[currentStep + 1]} &rarr;
+        </button>
+      ` : `
+        <button class="nav-btn primary" onclick="goBack()">
+          TOP
+        </button>
+      `}
+    </div>
+  `;
+
+  el.innerHTML = `
+    <div class="dash-header">
+      <h1>${u.name}&#12373;&#12435;&#12398;&#12480;&#12483;&#12471;&#12517;&#12508;&#12540;&#12489;</h1>
+      <a class="back-btn" onclick="goBack()">&larr; TOP</a>
+    </div>
+    ${progressHtml}
+    ${contentHtml}
+    ${navHtml}
+    <div class="page-footer">
+      KSI AI&#27963;&#29992;&#35611;&#24231; &#22238;3 &mdash; &#20986;&#21147;&#12501;&#12457;&#12540;&#12510;&#12483;&#12488;&#21046;&#24481;&#12480;&#12483;&#12471;&#12517;&#12508;&#12540;&#12489;
+    </div>
+  `;
+}
+</script>
+</body>
+</html>

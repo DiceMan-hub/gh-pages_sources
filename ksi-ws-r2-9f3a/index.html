@@ -646,10 +646,6 @@ const data = {
     structure: 'Apps Scriptで自動送信を実装するなど実行力が高い。一方で営業メールは「やりたいけどできていない」状態。NotebookLMやGensparkなど特化ツールを使い分けているのも特徴。',
     preparation: 'いつも使っているAIツール（ChatGPT / Claude等）にログインしておいてください。',
     prepForNext: '回2で練習したメール作成を次回はさらに深掘りします。特に準備は不要です。',
-    supplement: {
-      title: '💡 前回の質問への補足：「図・グラフの編集」について',
-      body: '前回「GenSparkで図が変えられない」とおっしゃっていた件について調べました。\n\nGenSparkは図を画像として出力する仕組みのため、エクスポート後のPowerPoint上では図の編集が難しいようです。生成段階でプロンプトを工夫すれば改善の余地はありますが、生成後に自由に編集したい場合は別のアプローチも試す価値があるかもしれません。\n\n<strong>試してみる価値がありそうなもの：Google SlidesのGemini機能</strong>\n皆さんが使っているGoogle Workspaceの中で、Geminiが編集可能なスライドを生成できるようになったとのことです（2026年3月アップデート）。\n\n• gemini.google.com でスライドを生成 →「Export to Slides」でGoogle Slidesファイルに\n• テキスト・レイアウト・図表がGoogle Slides上で編集できる可能性がある\n• 追加ツール不要。今のGoogle Workspaceで試せます\n\nまだ講師側でも十分に検証できていないので、興味があれば一緒に試してみましょう。回4のハンズオンで扱うこともできますので、フィードバックフォームでお知らせください。'
-    },
     recommendation: {
       task: '#1 営業メール作成',
       reasons: [
@@ -951,13 +947,6 @@ function renderDashboard() {
           `).join('')}
         </div>
       </div>
-
-      ${u.supplement ? `
-      <div class="section" style="background:#fffbeb; border:1px solid #f59e0b;">
-        <h2 style="font-size:1rem; color:#92400e; margin-bottom:0.8rem;">${u.supplement.title}</h2>
-        <p style="font-size:0.85rem; color:var(--text-sub); line-height:1.8; white-space:pre-line;">${u.supplement.body}</p>
-      </div>
-      ` : ''}
     `;
   }
 
