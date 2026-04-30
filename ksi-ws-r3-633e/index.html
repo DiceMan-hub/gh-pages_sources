@@ -666,7 +666,7 @@ const data = {
       insight: '何をどう整理しなくてはいけないのか、まず整理が必要',
       next: 'Coworkで自動化、Firecrawl'
     },
-    goal: '「何を整理すべきか」をAIに相談→ルール構造化→クリーニング後CSVを3コツで出力（メルマガに貼れる形が手元に残る）',
+    goal: '「何を整理すべきか」をAIに相談→ルール構造化→クリーニング後CSVを3コツで出力（スプシ管理用のクリーン版CSVが手元に残る／メルマガ素材選別の前段階を自動化）',
     steps: [
       {
         title: 'AIに「何を整理すべきか」を相談する',
@@ -683,8 +683,8 @@ const data = {
       {
         title: 'ルールを使ってクリーニング後CSVを出力（3コツ全部使う）',
         minutes: 7,
-        desc: 'Step 2のルールを使って、実データを「メルマガにそのまま使えるCSV」でAIに出力させます。\n\n今日の3つのコツを全部使うステップです：①CSV形式を明示／②サンプル行を1行見せる／③「説明文不要・CSV行のみ」と制約。\n\n回2で「8時間かかっていた作業」の出口が、ここで具体的な形（手元に残るCSV）になります。',
-        prompt: '以下のカオスデータに、先ほど作成したクリーニングルールを適用して、メルマガにそのまま使えるCSVを出力してください。\n\n【元データ】\nURL,ソース,取得日\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://example.com/logo.png,ロゴ画像,2026-04-02\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-03\nhttps://example.com/tracking?id=abc123,トラッキング,2026-04-03\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-04\nhttps://example.com/unsubscribe?token=xyz,配信解除,2026-04-05\nhttps://example.org/report/tcfd-disclosure-2025,CDP,2026-04-06\nhttps://example.org/news/carbon-tax-proposal,Reuters,2026-04-07\n\n【出力ルール（3コツ）】\n1. 形式：CSV（ヘッダー行付き）\n2. 列：URL, カテゴリ, 推奨理由（1行）, 取得日\n3. サンプル行（この形に揃えてください）：\n   https://www.meti.go.jp/policy/...,政策動向,経産省の温暖化政策最新報告,2026-04-03\n4. クリーニングルールで除外したURLは出力しない\n5. 説明文・前置き・コードブロック記号(```)は不要。CSV行のみ出力'
+        desc: 'Step 2のルールを使って、実データを「スプシ管理用のクリーン版CSV」でAIに出力させます（重複・画像・トラッキングURL等を除外したクリーン版を、元のスプシに戻して素材選別に使うイメージ）。\n\n今日の3つのコツを全部使うステップです：①CSV形式を明示／②サンプル行を1行見せる／③「説明文不要・CSV行のみ」と制約。\n\n回2で「8時間かかっていた作業」のうち、**前半のクリーニング工程**を自動化する第一歩になります。',
+        prompt: '以下のカオスデータに、先ほど作成したクリーニングルールを適用して、スプシ管理用のクリーン版CSV（除外対象は出力しない）を作ってください。\n\n【元データ】\nURL,ソース,取得日\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://www.env.go.jp/press/press_01234.html,環境省,2026-04-01\nhttps://example.com/logo.png,ロゴ画像,2026-04-02\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-03\nhttps://example.com/tracking?id=abc123,トラッキング,2026-04-03\nhttps://www.meti.go.jp/policy/energy_environment/global_warming/report2026.pdf,経産省,2026-04-04\nhttps://example.com/unsubscribe?token=xyz,配信解除,2026-04-05\nhttps://example.org/report/tcfd-disclosure-2025,CDP,2026-04-06\nhttps://example.org/news/carbon-tax-proposal,Reuters,2026-04-07\n\n【出力ルール（3コツ）】\n1. 形式：CSV（ヘッダー行付き）\n2. 列：URL, カテゴリ, 推奨理由（1行）, 取得日\n3. サンプル行（この形に揃えてください）：\n   https://www.meti.go.jp/policy/...,政策動向,経産省の温暖化政策最新報告,2026-04-03\n4. クリーニングルールで除外したURLは出力しない\n5. 説明文・前置き・コードブロック記号(```)は不要。CSV行のみ出力'
       }
     ]
   },
