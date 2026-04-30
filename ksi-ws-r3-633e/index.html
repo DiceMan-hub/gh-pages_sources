@@ -636,6 +636,12 @@ const data = {
         prompt: '出力形式を修正します。以下のサンプル行と同じ形式で全項目を出し直してください。\n\n【サンプル行】\n環境目標と達成状況, "2030年までにCO2排出量50%削減を目標。2024年度実績は38%削減で進捗率76%", p.12-14, あり\n\n・各セルの区切りはカンマ\n・要約にカンマが含まれる場合はダブルクォートで囲む\n・サンプル行以外の説明は不要'
       },
       {
+        title: '【もう一段】既存テンプレ（xlsx等）を丸ごと投入して埋めてもらう',
+        minutes: 8,
+        desc: 'もし普段業務で使っている調査表テンプレートがあれば、それをそのままAIにアップロードして「空欄を埋めて」と頼めます。これがコツ②（サンプルを見せる）の究極形です。\n\nAIが列構造を勝手に変えないように、必ず「列・順序を変えない」「埋められない箇所は『該当なし』」と指示するのがポイント。',
+        prompt: '添付した「調査表テンプレート.xlsx」の空欄を、同時にアップロードした「【報告書ファイル名】」から抽出した情報で埋めてください。\n\n【ルール】\n・列構造・順序は絶対に変えない\n・該当情報がない場合は「該当なし」と記入\n・各セルは150字以内に収める\n・抽出元のページ番号を「出典」列に必ず記入\n・テンプレート以外の説明文は出力しない\n・数式が入っている列があれば数式は触らない'
+      },
+      {
         title: '【発展】検証指示で信頼性を確認',
         minutes: 7,
         desc: '出力が出たら、「この内容が正しいか検証して」とAIに指示してみてください。AIに自分の出力を自己チェックさせることで、明らかな間違いを減らせます。\n\n完全な正確性は保証されないので、重要な数値は原文と照合する習慣をつけるのがベストです。',
@@ -858,6 +864,7 @@ function renderDashboard() {
           <div class="tip-content">
             <strong>サンプルを1つ見せる</strong>
             <p>欲しい出力の例を1行だけプロンプトに入れると精度が格段に上がる</p>
+            <p style="margin-top:0.4rem; font-size:0.78rem; color:#15803d;">→ <strong>究極形：既存テンプレ（xlsx等）を丸ごとアップロード</strong>して「空欄を埋めて」と頼む。構造ごとサンプル化＝AIが迷わない</p>
           </div>
         </div>
         <div class="tip-item">
@@ -934,7 +941,7 @@ function renderDashboard() {
         <div style="margin-top:1rem; padding:1rem 1.2rem; background:#fffbeb; border-radius:8px; border:1px solid #fbbf24;">
           <p style="font-size:0.82rem; font-weight:700; color:#92400e; margin-bottom:0.5rem;">回4で扱う題材（皆さんからの要望から）</p>
           <ul style="font-size:0.82rem; color:var(--text-sub); padding-left:1.2rem; margin:0; line-height:1.7;">
-            <li style="margin-bottom:0.3rem;"><strong>Aiさん</strong>：Cowork・Firecrawlでデータ収集・整理を仕組み化（今日作った"整理の設計図"がベースになります）</li>
+            <li style="margin-bottom:0.5rem;"><strong>Aiさん</strong>：情報源を分類（RSS / メール / Web）→ <strong>Cowork・Firecrawl・Gmail MCP</strong>で取得自動化 → AIで本文クレンジング → 自社NLに整形<br><span style="color:#92400e; font-weight:600; font-size:0.78rem;">　└ 宿題：いま使ってる情報源を10個リストアップしてきてください</span></li>
             <li style="margin-bottom:0.3rem;"><strong>Ayaさん</strong>：ES講座のnote/Webページ化／Hoopusサイト改善</li>
             <li><strong>Emiさん</strong>：Hoopusサイトの修正をAIと一緒に</li>
           </ul>
